@@ -1,0 +1,112 @@
+package com.example.a201b328_tictactoe;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.gridlayout.widget.GridLayout;
+
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    int player = 1;
+    boolean isWinner = false;
+    int imageClicked = -1;
+    int [][]winStates = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+    int []currState = {-1,-1,-1,-1,-1,-1,-1,-1,-1};
+    public void load(View view)
+    {
+        ImageView v = (ImageView) view;
+        int tag = Integer.parseInt(v.getTag().toString());
+        imageClicked = currState[tag];
+
+        if(!isWinner && imageClicked == -1)
+        {
+            if(player == 1)
+            {
+                v.setImageResource(R.drawable.cross);
+                currState[tag] = player;
+                Toast.makeText(this, tag+" "+"Cross",Toast.LENGTH_SHORT).show();
+                player = 2;
+            }else
+            {
+                v.setImageResource(R.drawable.zro);
+                currState[tag] = player;
+                Toast.makeText(this, tag+" "+"Zero",Toast.LENGTH_SHORT).show();
+                player = 1;
+            }
+
+            for(int i = 0; i < winStates.length; i++){
+                if(currState[winStates[i][0]] == currState[winStates[i][1]] && currState[winStates[i][1]] == currState[winStates[i][2]] && currState[winStates[i][0]] != -1)
+                {
+                    isWinner = true;
+                    dialoge_winner();
+                }
+            }
+            int count = 0;
+
+            for(int i = 0; i < currState.length; i++)
+            {
+                if(currState[i] != -1)
+                {
+                    count++;
+                }
+            }
+
+            if(count == currState.length && !isWinner)
+            {
+               dialoge_draw();
+            }
+        }
+    }
+
+    public void dialoge_winner(){
+        new AlertDialog.Builder(this)
+                .setIcon(R.drawable.winner)
+                .setTitle("Congratulation")
+                .setMessage("Player "+(player == 2?1:2)+" is Winner!")
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+    }
+
+    public void dialoge_draw(){
+        new AlertDialog.Builder(this)
+                .setIcon(R.drawable.draw)
+                .setTitle("Draw")
+                .setMessage("Unfortunately no one is Winner")
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+    }
+
+    public void reset(View view)
+    {
+        GridLayout gridLayout = findViewById(R.id.gridLayout);
+        int total_images = gridLayout.getChildCount();
+        for(int i = 0; i < total_images; i++){
+            ImageView v = (ImageView) gridLayout.getChildAt(i);
+            v.setImageDrawable(null);
+        }
+        isWinner = false;
+        imageClicked = -1;
+        for(int i = 0; i < currState.length; i++){
+            currState[i] = -1;
+        }
+        player = 1;
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+}
